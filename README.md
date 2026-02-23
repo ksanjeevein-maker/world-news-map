@@ -1,70 +1,98 @@
-# World News Map — Trading Intelligence Hub
+<div align="center">
+  <img src="https://img.shields.io/badge/Status-Active-success.svg" alt="Project Status"/>
+  <img src="https://img.shields.io/badge/Python-3.13+-blue.svg" alt="Python Version"/>
+  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License"/>
+</div>
 
-Real-time news aggregation + market data API for trading bots, with a web dashboard.
+# 🌍 World News Map — Trading Intelligence Hub
 
-## Quick Start (Local)
+A powerful algorithmic trading intelligence platform and interactive geopolitical dashboard. The World News Map serves dual purposes:
+1. **API Backend**: Real-time aggregation of news feeds, market changes, geopolitical events, and conflict data (via ACLED) synthesized into structured **Trading Signals**.
+2. **Interactive Front-End Dashboard**: A dynamic, fully responsive "war room" style web interface featuring live tickers, categorized news streams, financial status cards, and a fullscreen-capable interactive Leaflet event map.
 
-```bash
-# Double-click start.bat, or:
-cd backend
-pip install -r requirements.txt
-python main.py
-```
+---
 
-- **Dashboard:** http://localhost:8888/dashboard
-- **API docs:** http://localhost:8888/docs
-- **Health check:** http://localhost:8888/api/health
+## 🚀 Key Features
 
-## Bot API Endpoints
+* **Real-time News Aggregation**: Pulls continuously from 40+ global RSS sources spanning wire services *(AP, Reuters)*, major western media *(BBC, NYT)*, financial platforms *(Bloomberg, FT, MarketWatch)*, and regional networks across Asia, Africa, and Latin America.
+* **Geopolitical Signal Intelligence**: Natural Language syntax processing identifies structural trading signals (impact, severity, and market-sector targets) instantly.
+* **Interactive Live World Map**: Dynamic Leaflet map converting keywords and conflict locations into precise marker clusters. Features map-toggles, Severity filtering (Medium/High/Critical), source combination, and a dedicated **Fullscreen Mode**.
+* **Crypto & Forex Status**: Live price and 24h change integrations covering Top 30 Crypto assets, Fear & Greed indices, and 15 global Forex fiat pairs.
+* **ACLED Conflict Data Integration**: Opt-in integration for strict verified military conflict and civilian disruption mapping with exact fatalities metrics.
+
+---
+
+## 🛠 Tech Stack & Architecture
+
+- **Backend Platform:** Python 3.13, FastAPI, Uvicorn (ASGI async runner).
+- **Asynchronous Data Handling:** `httpx` and `feedparser`.
+- **Background Cron Engine:** `apscheduler`.
+- **Frontend Environment:** Vanilla ES6 Javascript, HTML5, Modular CSS.
+- **Mapping & Visualization:** Leaflet.js with CARTO dark-mode thematic subdomains.
+
+---
+
+## 💻 Quick Start (Local Setup)
+
+The project includes a streamlined local boot configuration. 
+
+### Prerequisites
+- Python 3.13+
+- Git
+
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/ksanjeevein-maker/world-news-map.git
+   cd world-news-map
+   ```
+2. Run the startup script (Windows) or install manually:
+   ```bash
+   # Windows Automatic Setup
+   start.bat
+
+   # Manual Setup
+   cd backend
+   pip install -r requirements.txt
+   python main.py
+   ```
+
+### Access Points
+- **Interactive Dashboard:** [http://localhost:8888/dashboard](http://localhost:8888/dashboard)
+- **Interactive Swagger API Docs:** [http://localhost:8888/docs](http://localhost:8888/docs)
+- **JSON Signals Output:** [http://localhost:8888/api/signals](http://localhost:8888/api/signals)
+
+*(Note for ACLED Support: To enable live military conflict data, set the `ACLED_API_KEY` and `ACLED_EMAIL` environment variables).*
+
+---
+
+## 📡 API Reference for Trading Bots
+
+Connect algorithm execution bots instantly via standard GET calls:
 
 | Endpoint | Description |
 |---|---|
-| `GET /api/signals` | Trading signals (conflict, sanctions, rate decisions, etc.) |
-| `GET /api/signals?affects=crypto` | Signals affecting crypto only |
-| `GET /api/signals?impact=critical` | Only critical-impact signals |
-| `GET /api/news/latest` | Latest headlines from 36+ sources |
-| `GET /api/news/latest?category=markets` | Filter by category |
-| `GET /api/news/breaking` | Breaking + elevated severity only |
-| `GET /api/market/crypto` | Top 30 crypto + Fear & Greed Index |
-| `GET /api/market/forex` | 15 USD forex pairs |
-| `GET /api/stats` | System statistics |
+| `GET /api/signals` | Core trading signals (conflict, sanctions, rate decisions, etc.) |
+| `GET /api/signals?affects=crypto` | Return signals currently flagged to affect Crypto markers |
+| `GET /api/signals?impact=critical` | Critical-impact signals only |
+| `GET /api/news/latest` | Clean, chronological JSON feed of latest headlines covering all 40+ sources |
+| `GET /api/news/latest?category=markets` | Categorical news filters |
+| `GET /api/news/breaking` | Urgent severity filters |
+| `GET /api/market/crypto` | Full 30-coin dump and current overarching 'Fear & Greed Index' |
+| `GET /api/market/forex` | Current rates across 15+ fiat exchanges |
+| `GET /api/conflicts` | Advanced ACLED conflict data queries *(requires environmental setup)* |
 
-## Deploy to Cloud (for 24/7 bot access)
+---
 
-### Option 1: Railway (Recommended)
-1. Push this repo to GitHub
-2. Go to [railway.app](https://railway.app)
-3. New Project → Deploy from GitHub repo
-4. Railway auto-detects `railway.json` and deploys
-5. Your bot endpoint becomes: `https://your-app.up.railway.app/api/signals`
+## ☁️ Deployment
 
-### Option 2: Render
-1. Push to GitHub
-2. Go to [render.com](https://render.com)
-3. New Web Service → Connect your repo
-4. Render auto-detects `render.yaml` and deploys (free tier available)
+The project is structured to deploy smoothly to **Railway**, **Render**, or any generic **Docker** hosting architecture supporting standard `Uvicorn` deployments. Configurations such as `railway.json`, `render.yaml`, and a standard `Dockerfile` are strictly maintained in the repository root for instantaneous deployment synchronization.
 
-### Option 3: Docker (any VPS)
-```bash
-docker build -t world-news-map .
-docker run -d -p 8888:8888 --name wnm world-news-map
-```
+---
 
-## Data Sources
-- **News RSS (36 feeds):** Reuters, AP, BBC, NYT, Guardian, WaPo, Bloomberg, CNBC, FT, Al Jazeera, SCMP, TASS, Xinhua, Defense News, Hacker News, and more
-- **Crypto:** CoinGecko (top 30), Fear & Greed Index
-- **Forex:** Open Exchange Rates (15 USD pairs)
+## 📜 License
 
-## Architecture
-```
-Backend (FastAPI)         Frontend (Dashboard)
-┌─────────────────┐      ┌──────────────────┐
-│ RSS Aggregator   │      │ News Feed Panel  │
-│ Market Fetcher   │──────│ Signal Panel     │
-│ Signal Engine    │ API  │ Crypto Panel     │
-│ Scheduler (3min) │      │ Forex Panel      │
-└─────────────────┘      └──────────────────┘
-         │
-    Your Trading Bots
-    (GET /api/signals)
-```
+Created under the [MIT License](LICENSE). 
+You are free to leverage this intelligence engine, modify its UI, or integrate it commercially without restrictions. 
+
+*Designed and engineered for quantitative advantage.*
