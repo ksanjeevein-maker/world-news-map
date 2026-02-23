@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="World News Map — Real-time trading intelligence dashboard">
+    <title>World News Map — Trading Intelligence</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
+</head>
+
+<body>
+
+    <!-- ═══ Header ═══ -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <span class="logo-icon">🌍</span>
+                WORLD NEWS MAP
+            </div>
+            <div class="status-bar">
+                <div class="status-item">
+                    <span id="status-dot" class="status-dot"></span>
+                    <span id="status-text">Connecting...</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <span id="header-time" class="header-time">--:--:--</span>
+        </div>
+    </header>
+
+    <!-- ═══ Tab Navigation ═══ -->
+    <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="news" onclick="switchTab('news')">
+            <span class="tab-icon">📰</span> News Feed
+        </button>
+        <button class="tab-btn" data-tab="signals" onclick="switchTab('signals')">
+            <span class="tab-icon">⚡</span> Trading Signals
+        </button>
+        <button class="tab-btn" data-tab="map" onclick="switchTab('map')">
+            <span class="tab-icon">🗺️</span> World Map
+        </button>
+        <button class="tab-btn" data-tab="crypto" onclick="switchTab('crypto')">
+            <span class="tab-icon">₿</span> Crypto
+        </button>
+        <button class="tab-btn" data-tab="forex" onclick="switchTab('forex')">
+            <span class="tab-icon">💱</span> Forex
+        </button>
+    </nav>
+
+    <!-- ═══ Signal Ticker ═══ -->
+    <div class="signal-ticker">
+        <span class="ticker-label">⚡ LIVE</span>
+        <div class="ticker-scroll">
+            <div class="ticker-track" id="ticker-track">
+                <span class="ticker-item" style="color: var(--text-muted)">Initializing...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Tab Content Pages ═══ -->
+    <main class="tab-content">
+
+        <!-- TAB: News Feed -->
+        <section class="tab-page active" id="page-news">
+            <div class="page-header">
+                <h1 class="page-title">📰 News Feed</h1>
+                <span class="page-badge" id="news-count">0</span>
+            </div>
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-category="" onclick="setNewsFilter(null)">All</button>
+                <button class="filter-tab" data-category="breaking" onclick="setNewsFilter('breaking')">🔴
+                    Breaking</button>
+                <button class="filter-tab" data-category="geopolitical" onclick="setNewsFilter('geopolitical')">🌍
+                    Geopolitical</button>
+                <button class="filter-tab" data-category="markets" onclick="setNewsFilter('markets')">📈
+                    Markets</button>
+                <button class="filter-tab" data-category="crypto" onclick="setNewsFilter('crypto')">₿ Crypto</button>
+                <button class="filter-tab" data-category="military" onclick="setNewsFilter('military')">🎖️
+                    Military</button>
+                <button class="filter-tab" data-category="cyber" onclick="setNewsFilter('cyber')">🔒 Cyber</button>
+                <button class="filter-tab" data-category="energy" onclick="setNewsFilter('energy')">⛽ Energy</button>
+                <button class="filter-tab" data-category="disaster" onclick="setNewsFilter('disaster')">🌊
+                    Disaster</button>
+            </div>
+            <div class="news-list" id="news-list">
+                <div class="loading">
+                    <div class="spinner"></div> Loading feeds...
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: Trading Signals -->
+        <section class="tab-page" id="page-signals">
+            <div class="page-header">
+                <h1 class="page-title">⚡ Trading Signals</h1>
+                <span class="page-badge" id="signals-count">0</span>
+            </div>
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-impact="" onclick="setSignalFilter(null)">All</button>
+                <button class="filter-tab" data-impact="critical" onclick="setSignalFilter('critical')">🔴
+                    Critical</button>
+                <button class="filter-tab" data-impact="high" onclick="setSignalFilter('high')">🟠 High</button>
+                <button class="filter-tab" data-impact="medium" onclick="setSignalFilter('medium')">🟡 Medium</button>
+            </div>
+            <div class="signals-list" id="signals-list">
+                <div class="loading">
+                    <div class="spinner"></div> Analyzing headlines...
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: World Map -->
+        <section class="tab-page" id="page-map">
+            <div class="page-header">
+                <h1 class="page-title">🗺️ World Map — Live Events</h1>
+                <div class="map-legend">
+                    <span class="legend-item"><span class="legend-dot critical"></span> Critical</span>
+                    <span class="legend-item"><span class="legend-dot high"></span> High</span>
+                    <span class="legend-item"><span class="legend-dot medium"></span> Medium</span>
+                    <span class="legend-item"><span class="legend-dot normal"></span> News</span>
+                    <span class="legend-item" style="font-size: 0.75rem; color: var(--text-muted)"
+                        id="acled-status">ACLED: checking...</span>
+                </div>
+            </div>
+            <div class="filter-tabs" id="map-filters">
+                <button class="filter-tab active" data-mapfilter="all" onclick="setMapFilter('all')">🌍 All</button>
+                <button class="filter-tab" data-mapfilter="critical" onclick="setMapFilter('critical')">🔴
+                    Critical</button>
+                <button class="filter-tab" data-mapfilter="high" onclick="setMapFilter('high')">🟠 High</button>
+                <button class="filter-tab" data-mapfilter="medium" onclick="setMapFilter('medium')">🟡 Medium</button>
+                <span style="width:1px; background:var(--border-medium); margin:4px 8px; flex-shrink:0"></span>
+                <button class="filter-tab active" data-mapsource="acled" onclick="toggleMapSource('acled')">⚔️ ACLED
+                    Conflicts</button>
+                <button class="filter-tab active" data-mapsource="news" onclick="toggleMapSource('news')">📰 News
+                    Signals</button>
+                <span style="flex:1"></span>
+                <button class="filter-tab" onclick="toggleFullscreenMap()" id="btn-fullscreen">⛶ Fullscreen</button>
+            </div>
+            <div id="map-container"></div>
+        </section>
+
+        <!-- TAB: Crypto -->
+        <section class="tab-page" id="page-crypto">
+            <div class="page-header">
+                <h1 class="page-title">₿ Crypto Markets</h1>
+                <span class="page-badge" id="crypto-count">0</span>
+            </div>
+            <div class="fear-greed-bar" id="fear-greed" style="display:none"></div>
+            <div class="ticker-grid" id="crypto-grid">
+                <div class="loading">
+                    <div class="spinner"></div> Loading crypto data...
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: Forex -->
+        <section class="tab-page" id="page-forex">
+            <div class="page-header">
+                <h1 class="page-title">💱 Forex Rates (USD Base)</h1>
+                <span class="page-badge" id="forex-count">0</span>
+            </div>
+            <div class="ticker-grid" id="forex-grid">
+                <div class="loading">
+                    <div class="spinner"></div> Loading forex data...
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="/static/app.js"></script>
+</body>
+
+</html>
